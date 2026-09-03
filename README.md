@@ -1,4 +1,4 @@
-[Official release is here: 2026.06.1](https://github.com/home-assistant/docker-base/releases/tag/2026.06.1)
+[Official release is here: 3.24-2026.06.1 ](https://github.com/home-assistant/docker-base/pkgs/container/base/948801341?tag=3.24-2026.06.1)
 
 # THIS IS NOT OFFICIAL RELEASE !
 
