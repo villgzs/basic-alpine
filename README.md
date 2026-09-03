@@ -17,7 +17,7 @@ USE AT YOUR OWN RISK.
 ---
 ![Docker Image Version](https://img.shields.io/github/v/release/home-assistant/docker-base?label=Home%20Assistant%20Core&color=blue)
 ![Architecture](https://img.shields.io/badge/Architecture-ARMv6%20%7C%20ARMv7-orange)
-![Build Status](https://img.shields.io/github/actions/workflow/status/villgzs/basic-alpine/build.yml?label=Build)
+![Build Status](https://img.shields.io/github/actions/workflow/status/villgzs/basic-alpine/docker-build.yml?label=Build)
 
 ### STEP No.1 - 2026.SEP.2.
 
