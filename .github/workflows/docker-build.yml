@@ -1,30 +1,35 @@
 name: Build and Push Docker Image
 
 on:
-  push:
-    branches:
-      - main
-      - master
-    tags:
-      - "v*"
-  pull_request:
-    branches:
-      - main
-      - master
   workflow_dispatch:
     inputs:
       platforms:
-        description: "Platforms to build (comma-separated)"
+        description: "Platforms to build (comma-separated):linux/arm/v7,linux/arm/v6"
         required: false
         default: "linux/arm/v7,linux/arm/v6"
       push:
         description: "Push image to registry"
         type: boolean
         default: true
+      base_alpine_version:
+        description: "Home Assistant Base Images verzió (üres = legfrissebb stable)"
+        required: false
+        default: "2026.06.1"
+      test_build:
+        description: 'Teszt üzemmód (csak az első néhány sor feldolgozása)'
+        required: false
+        type: boolean
+        default: true  # Alapértelmezetten bepipálva
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  REGISTRY_PREFIX: ghcr.io/${{ github.repository_owner }}
+  ARCHITECTURES: '["armv7", "armhf"]'
+  ALPINE_LATEST: "3.24"
+  DEBIAN_LATEST: "trixie"
+  UBUNTU_LATEST: "26.04"
+  PYTHON_LATEST: "3.14"
 
 jobs:
   build:
@@ -96,3 +101,4 @@ jobs:
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          date >> $GITHUB_STEP_SUMMARY
