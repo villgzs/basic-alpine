@@ -62,7 +62,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      # Architektúra-specifikus push (digest alapon az egyesítéshez)
+      # Architektúra-specifikus build és digest push
       - name: Build and push by digest
         id: build
         uses: docker/build-push-action@v6
@@ -71,6 +71,8 @@ jobs:
           file: ./Dockerfile
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
+          # ITT A JAVÍTÁS: Szükséges a nevét átadni a registry felé
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.architecture }}
           push: ${{ inputs.push }}
           outputs: ${{ inputs.push && 'type=image,name-canonical=true,push-by-digest=true' || 'type=image,push=false' }}
           cache-from: type=gha,scope=${{ matrix.architecture }}
@@ -141,8 +143,17 @@ jobs:
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
-          docker buildx imagetools create $(jq -r '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(ls * | segment=; for i in *; do echo -n "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:$i "; done)
+          # Végleges tag-ek összeállítása a metadatából
+          TAGS=$(jq -r '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
+          
+          # Digestek összefűzése a feltöltött rétegekből
+          DIGESTS=""
+          for i in *; do
+            DIGESTS="${DIGESTS} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:${i}"
+          done
+          
+          # Manifest lista létrehozása és feltöltése
+          docker buildx imagetools create ${TAGS} ${DIGESTS}
 
       - name: Summary
         run: |
