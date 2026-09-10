@@ -25,7 +25,7 @@ jobs:
   build:
     name: Build ${{ matrix.architecture }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - architecture: armv7
@@ -37,7 +37,6 @@ jobs:
       contents: read
       packages: write
       id-token: write
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -62,7 +61,6 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      # Architektúra-specifikus build és digest push
       - name: Build and push by digest
         id: build
         uses: docker/build-push-action@v6
@@ -71,10 +69,7 @@ jobs:
           file: ./Dockerfile
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          # ITT A JAVÍTÁS: Szükséges a nevét átadni a registry felé
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.architecture }}
-          push: ${{ inputs.push }}
-          outputs: ${{ inputs.push && 'type=image,name-canonical=true,push-by-digest=true' || 'type=image,push=false' }}
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=${{ inputs.push }}
           cache-from: type=gha,scope=${{ matrix.architecture }}
           cache-to: type=gha,mode=max,scope=${{ matrix.architecture }}
           build-args: |
@@ -82,7 +77,6 @@ jobs:
             BASE_ALPINE_VERSION=${{ inputs.base_alpine_version }}
             TEST_BUILD=${{ inputs.test_build }}
 
-      # A digest elmentése artifactként az egyesítő lépés számára
       - name: Export digest
         if: inputs.push
         run: |
@@ -107,7 +101,6 @@ jobs:
     permissions:
       packages: write
       id-token: write
-
     steps:
       - name: Download digests
         uses: actions/download-artifact@v4
@@ -143,16 +136,8 @@ jobs:
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
-          # Végleges tag-ek összeállítása a metadatából
-          TAGS=$(jq -r '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
-          
-          # Digestek összefűzése a feltöltött rétegekből
-          DIGESTS=""
-          for i in *; do
-            DIGESTS="${DIGESTS} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:${i}"
-          done
-          
-          # Manifest lista létrehozása és feltöltése
+          TAGS=$(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
+          DIGESTS=$(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
           docker buildx imagetools create ${TAGS} ${DIGESTS}
 
       - name: Summary
