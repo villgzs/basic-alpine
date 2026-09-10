@@ -92,7 +92,8 @@ WORKDIR /usr/src/bashio
 # Install bashio
 RUN \
     mv /usr/src/bashio/bashio-*/lib /usr/lib/bashio \
-    && ln -s /usr/lib/bashio/bashio /usr/bin/bashio
+    && ln -s /usr/lib/bashio/bashio /usr/bin/bashio \
+    && ls -las /*
 
 # Arch-specific downloads (tempio and s6-overlay)
 RUN \
