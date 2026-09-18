@@ -21,6 +21,8 @@ USE AT YOUR OWN RISK.
 
 ### STEP No.1 - 2026.SEP.2.
 
+#### [Home-assistant/docker-base - actions for releases](https://github.com/home-assistant/docker-base/actions?query=event%3Arelease)
+
 # Alpine Home Assistant Base Image - for arm 32 bit platforms
 
 Multi-stage Docker image based on Alpine Linux with:
