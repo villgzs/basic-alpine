@@ -154,7 +154,7 @@ ENTRYPOINT ["/init"]
 # Set shell
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
-ARG EXTRA_INDEX_URL="https://villgzs.github.io/musllinux-index/ https://wheels.home-assistant.io/musllinux-index/"
+ARG EXTRA_INDEX_URL="https://villgzs.github.io/musllinux-index/"
 
 # Default env for S6 and Python/uv
 ENV \
