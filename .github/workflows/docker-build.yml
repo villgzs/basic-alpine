@@ -70,10 +70,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=${{ inputs.push }}
-          cache-from: type=gha,scope=${{ matrix.architecture }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.architecture }}
           build-args: |
-            BUILDKIT_INLINE_CACHE=1
             BASE_ALPINE_VERSION=${{ inputs.base_alpine_version }}
             TEST_BUILD=${{ inputs.test_build }}
 
@@ -124,7 +121,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha,prefix=sha-
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+            type=raw,value=${{inputs.base_alpine_version}},enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
 
       - name: Log in to Registry
         uses: docker/login-action@v3
